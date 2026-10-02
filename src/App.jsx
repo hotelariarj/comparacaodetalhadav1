@@ -8,6 +8,7 @@ import {
 } from "@phosphor-icons/react";
 import demo from "./data/detailed-comparison.sample.json";
 import aiResults from "./data/ai-analysis-result.sample.json";
+import AccountDrilldown from "./AccountDrilldown";
 
 const primaryRows = [
   { id: "LOTE-2024-001", date: "14/08/2024", description: "Pagamentos Lote - Fornecedores Diversos", origin: 6000, accounting: 6800, difference: "+R$ 800,00", status: "Divergente", issue: "valor", ai: true },
@@ -122,6 +123,7 @@ function AppShell({ children, currentNav, onNavigate }) {
 
 export function App() {
   const [currentNav, setCurrentNav] = useState("Comparação Detalhada");
+  const [accountDrilldown, setAccountDrilldown] = useState(false);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
   const [filterOpen, setFilterOpen] = useState(false);
@@ -198,12 +200,15 @@ export function App() {
   };
 
   return <AppShell currentNav={currentNav} onNavigate={setCurrentNav}>
-    {currentNav !== "Comparação Detalhada" ? <ModulePage name={currentNav} onBack={() => setCurrentNav("Comparação Detalhada")} /> : <>
+    {currentNav !== "Comparação Detalhada" ? <ModulePage name={currentNav} onBack={() => setCurrentNav("Comparação Detalhada")} /> : accountDrilldown ? <>
+    <AccountDrilldown onBack={() => setAccountDrilldown(false)} onToast={setToast} />
+    {toast && <div className="toast" role="status"><CheckCircle weight="fill" /><span>{toast}</span><IconButton label="Fechar notificação" onClick={() => setToast("")}><X /></IconButton></div>}
+    </> : <>
     <main id="main-content" className="main-content">
       <nav className="breadcrumb" aria-label="Você está em"><button type="button" onClick={() => setCurrentNav("Home")}>Home</button><CaretRight /><button type="button" onClick={() => { setScope("Todas as contas"); setPage(1); }}>Ativo Circulante</button><CaretRight /><span>{scope === "Todas as contas" ? "Todas as contas" : "1.1.2.001 Banco Conta Movimento"}</span></nav>
       <section className="page-heading">
         <div><div className="heading-line"><h1>{scope === "Todas as contas" ? "Ativo Circulante" : scope.includes("1.1.2.002") ? "1.1.2.002 Banco Conta Aplicação" : scope.includes("1.1.3.001") ? "1.1.3.001 Clientes Nacionais" : "1.1.2.001 Banco Conta Movimento"}</h1><span className={`analysis-tag ${reviewed ? "success" : ""}`}>{reviewed ? <CheckCircle weight="fill" /> : <WarningCircle weight="fill" />}{reviewed ? "Revisada" : "Em análise"}</span></div><p>Comparação detalhada · <strong>02 - Bourbon Curitiba Convention Hotel</strong> · Atualizado hoje às {updatedAt} <IconButton label="Atualizar dados" onClick={() => { setUpdatedAt(new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })); setToast("Dados atualizados agora."); }}><ArrowsClockwise /></IconButton></p></div>
-        <div className="page-actions"><label>Escopo<select value={scope} onChange={(e) => { setScope(e.target.value); setPage(1); setSelected(new Set()); }}><option>Todas as contas</option><option value="1.1.2.001">1.1.2.001 Banco Conta Movimento</option><option>1.1.2.002 Banco Conta Aplicação</option><option>1.1.3.001 Clientes Nacionais</option></select></label><label>Período<select value={period} onChange={(e) => { setPeriod(e.target.value); setPage(1); setUpdatedAt("agora"); setToast(`Período alterado para ${e.target.value}.`); }}><option>ago/2024</option><option>jul/2024</option><option>jun/2024</option></select></label><button type="button" className="button secondary" onClick={exportCsv}><DownloadSimple />Exportar</button></div>
+        <div className="page-actions"><label>Escopo<select value={scope} onChange={(e) => { setScope(e.target.value); setPage(1); setSelected(new Set()); }}><option>Todas as contas</option><option value="1.1.2.001">1.1.2.001 Banco Conta Movimento</option><option>1.1.2.002 Banco Conta Aplicação</option><option>1.1.3.001 Clientes Nacionais</option></select></label><label>Período<select value={period} onChange={(e) => { setPeriod(e.target.value); setPage(1); setUpdatedAt("agora"); setToast(`Período alterado para ${e.target.value}.`); }}><option>ago/2024</option><option>jul/2024</option><option>jun/2024</option></select></label><button type="button" className="button secondary" onClick={() => setAccountDrilldown(true)}><List />Detalhar conta</button><button type="button" className="button secondary" onClick={exportCsv}><DownloadSimple />Exportar</button></div>
       </section>
 
       <section className="summary-card" aria-label="Resumo da conciliação">

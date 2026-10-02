@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-  ArrowLeft, ArrowSquareOut, ArrowsClockwise, CaretDown, Check, CheckCircle, DotsThreeVertical,
+  ArrowLeft, ArrowSquareOut, ArrowsClockwise, CaretDown, Check, CheckCircle,
   DownloadSimple, FileArrowUp, Info, Paperclip, Sparkle, SpinnerGap, WarningCircle, X,
 } from "@phosphor-icons/react";
 
@@ -55,7 +55,13 @@ export default function AccountDrilldown({ account = fallbackAccount, onBack, on
   const [documentState, setDocumentState] = useAnalysisState();
   const [suggestionState, setSuggestionState] = useAnalysisState();
   const [expandedDocument, setExpandedDocument] = useState(null);
+  const [expandedMovement, setExpandedMovement] = useState(null);
+  const [activeWorkspace, setActiveWorkspace] = useState("comparison");
   const [suggestions, setSuggestions] = useState(initialSuggestions.map((item) => ({ ...item, decision: "pending" })));
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const decide = (id, decision) => {
     setSuggestions((items) => items.map((item) => item.id === id ? { ...item, decision } : item));
@@ -65,21 +71,54 @@ export default function AccountDrilldown({ account = fallbackAccount, onBack, on
   const accepted = suggestions.filter((item) => item.decision === "accepted").length;
   const selectedAccount = account || fallbackAccount;
   const isMatched = selectedAccount.tone === "positive";
+  const comparisonRows = ledgerRows.map((ledger, index) => ({
+    id: ledger.document,
+    ledger,
+    system: systemRows[index] || null,
+    matched: ledger.status === "OK" && systemRows[index]?.status === "OK",
+  }));
+  const divergentMovements = comparisonRows.filter((row) => !row.matched).length;
 
   return <main id="main-content" className="main-content account-drilldown">
     <nav className="breadcrumb" aria-label="Você está em"><button type="button" onClick={onBack}>Home</button><span>/</span><span>{selectedAccount.code} {selectedAccount.name}</span></nav>
-    <section className="drilldown-heading">
-      <button type="button" className="icon-button" aria-label="Voltar para comparação" onClick={onBack}><ArrowLeft /></button>
-      <div><div className="heading-line"><h1>Comparação Detalhada</h1>{versionLabel && <span className="analysis-tag success">{versionLabel}</span>}</div><p>{selectedAccount.code} - {selectedAccount.name}</p></div>
+    <section className="workspace-hero" aria-labelledby="comparison-title">
+      <div className="workspace-hero-heading">
+        <button type="button" className="icon-button" aria-label="Voltar para a Home" onClick={onBack}><ArrowLeft /></button>
+        <div><span className="workspace-eyebrow">Conta em revisão</span><div className="heading-line"><h1 id="comparison-title">{selectedAccount.name}</h1>{versionLabel && <span className="analysis-tag success">{versionLabel}</span>}</div><p>{selectedAccount.code} · Comparação detalhada</p></div>
+      </div>
+      <div className="workspace-status"><span className={`status ${isMatched ? "status--ok" : "status--valor"}`}>{isMatched ? <CheckCircle weight="fill" /> : <WarningCircle weight="fill" />}{selectedAccount.status}</span><small>Última atualização hoje, 08:12</small></div>
+      <dl className="workspace-metrics"><div><dt>Saldo contábil</dt><dd>{selectedAccount.balance}</dd></div><div><dt>Sistema de origem</dt><dd>{selectedAccount.systemValue}</dd></div><div><dt>Diferença a tratar</dt><dd className={isMatched ? "positive" : "negative"}>{selectedAccount.difference}</dd></div><div><dt>Progresso</dt><dd>32 de 42</dd><span><i style={{ width: "76%" }} /></span></div></dl>
     </section>
 
-    <section className="drilldown-card account-summary" aria-labelledby="account-summary-title">
-      <h2 id="account-summary-title"><FileArrowUp />Resumo da Conta</h2>
-      <dl><div><dt>Saldo Contábil</dt><dd>{selectedAccount.balance}</dd></div><div><dt>Valor Sistema</dt><dd>{selectedAccount.systemValue}</dd></div><div><dt>Diferença</dt><dd className={isMatched ? "positive" : "negative"}>{selectedAccount.difference}</dd></div><div><dt>Status</dt><dd><span className={`status ${isMatched ? "status--ok" : "status--valor"}`}>{isMatched ? <CheckCircle weight="fill" /> : <WarningCircle weight="fill" />}{selectedAccount.status}</span></dd></div></dl>
-    </section>
+    <nav className="workspace-tabs" aria-label="Etapas da análise" role="tablist">
+      <button type="button" role="tab" aria-selected={activeWorkspace === "comparison"} className={activeWorkspace === "comparison" ? "active" : ""} onClick={() => setActiveWorkspace("comparison")}><ArrowsClockwise />Comparar movimentos <span>{divergentMovements}</span></button>
+      <button type="button" role="tab" aria-selected={activeWorkspace === "documents"} className={activeWorkspace === "documents" ? "active" : ""} onClick={() => setActiveWorkspace("documents")}><Paperclip />Validar documentos <span>{selectedAccount.attachments?.length || documents.length}</span></button>
+      <button type="button" role="tab" aria-selected={activeWorkspace === "suggestions"} className={activeWorkspace === "suggestions" ? "active" : ""} onClick={() => setActiveWorkspace("suggestions")}><Sparkle />Sugestões da IA <span>{pending}</span></button>
+    </nav>
 
-    {selectedAccount.attachments?.length > 0 && <section className="drilldown-card attached-documents" aria-labelledby="attached-documents-title"><header><h2 id="attached-documents-title"><Paperclip />Documentos Anexados</h2><span>{selectedAccount.attachments.length} documento</span></header>{selectedAccount.attachments.map((document) => <article key={document.name}><div className="attached-document-icon"><FileArrowUp /></div><div><strong>{document.name}</strong><span>{document.size} · {document.date} · {document.author}</span></div><div><button type="button" className="button ghost" onClick={() => onToast?.(`${document.name} aberto para visualização.`)}><ArrowSquareOut />Visualizar</button><button type="button" className="icon-button" aria-label={`Baixar ${document.name}`} onClick={() => onToast?.(`Download de ${document.name} iniciado.`)}><DownloadSimple /></button></div></article>)}</section>}
+    {activeWorkspace === "comparison" && <section className="workspace-comparison" role="tabpanel">
+      <aside className="review-priority" aria-labelledby="review-priority-title">
+        <span><WarningCircle weight="fill" /></span>
+        <div><small>PRÓXIMA AÇÃO RECOMENDADA</small><h2 id="review-priority-title">Revise os {divergentMovements} movimentos divergentes</h2><p>Comece pelos lançamentos com o mesmo documento e valores diferentes. Eles costumam ser resolvidos mais rapidamente.</p></div>
+        <button type="button" className="button primary" onClick={() => setExpandedMovement(comparisonRows.find((row) => !row.matched)?.id)}>Começar revisão</button>
+      </aside>
 
+      <section className="unified-comparison" aria-labelledby="movements-title">
+        <header><div><h2 id="movements-title">Movimentos pareados</h2><p>Contabilidade e sistema lado a lado, organizados pelo documento correspondente.</p></div><span>{comparisonRows.length} movimentos</span></header>
+        <div className="comparison-table-wrap"><table className="comparison-table"><thead><tr><th>Data e documento</th><th>Contabilidade</th><th aria-label="Resultado da comparação">Comparação</th><th>Sistema de origem</th><th><span className="visually-hidden">Ações</span></th></tr></thead><tbody>{comparisonRows.map((row) => <tr key={row.id} className={row.matched ? "matched" : "divergent"}>
+          <td><strong>{row.ledger.date}</strong><small>{row.ledger.document}</small></td>
+          <td><strong>{row.ledger.description}</strong><span className="number">{row.ledger.value}</span></td>
+          <td><span className={`comparison-state ${row.matched ? "matched" : "divergent"}`}>{row.matched ? <CheckCircle weight="fill" /> : <WarningCircle weight="fill" />}{row.matched ? "Conciliado" : "Divergente"}</span></td>
+          <td>{row.system ? <><strong>{row.system.description}</strong><span className="number">{row.system.value}</span></> : <><strong>Não encontrado</strong><span>Sem correspondência</span></>}</td>
+          <td><button type="button" className="button ghost compact-button" aria-expanded={expandedMovement === row.id} onClick={() => setExpandedMovement(expandedMovement === row.id ? null : row.id)}>{expandedMovement === row.id ? "Fechar" : "Revisar"}</button></td>
+        </tr>).flatMap((row, index) => {
+          const data = comparisonRows[index];
+          return expandedMovement === data.id ? [row, <tr className="movement-review-row" key={`${data.id}-review`}><td colSpan="5"><div><span><Info weight="fill" /></span><p><strong>{data.matched ? "Movimento já conciliado" : "Possível diferença de lançamento"}</strong>{data.matched ? "Os valores, datas e documentos coincidem nas duas fontes." : "Documento e data são compatíveis. Confira o valor e escolha uma sugestão de conciliação para concluir."}</p><button type="button" className="button secondary" onClick={() => { setActiveWorkspace("suggestions"); onToast?.(`Sugestões para ${data.id} carregadas.`); }}>Ver sugestões</button></div></td></tr>] : [row]; })}</tbody></table></div>
+      </section>
+    </section>}
+
+    {activeWorkspace === "documents" && <div className="workspace-panel" role="tabpanel">
+    {selectedAccount.attachments?.length > 0 && <section className="drilldown-card attached-documents" aria-labelledby="attached-documents-title"><header><div><h2 id="attached-documents-title"><Paperclip />Documentos da conta</h2><p>Arquivos enviados para apoiar a conciliação.</p></div><span>{selectedAccount.attachments.length} documento</span></header>{selectedAccount.attachments.map((document) => <article key={document.name}><div className="attached-document-icon"><FileArrowUp /></div><div><strong>{document.name}</strong><span>{document.size} · {document.date} · {document.author}</span></div><div><button type="button" className="button ghost" onClick={() => onToast?.(`${document.name} aberto para visualização.`)}><ArrowSquareOut />Visualizar</button><button type="button" className="icon-button" aria-label={`Baixar ${document.name}`} onClick={() => onToast?.(`Download de ${document.name} iniciado.`)}><DownloadSimple /></button></div></article>)}</section>}
     <section className="drilldown-card document-analysis" aria-labelledby="document-analysis-title">
       <header><h2 id="document-analysis-title"><FileArrowUp />Análise de Documentos com IA</h2>{documentState === "ready" && <button className="button secondary" onClick={() => setDocumentState("loading")}><ArrowsClockwise />Nova análise</button>}</header>
       {documentState === "empty" && <div className="analysis-empty"><FileArrowUp size={46} /><strong>Validar Documentos Anexados</strong><p>A IA irá analisar os documentos anexados e verificar se são compatíveis com as transações (valores, datas e descrições).</p><button className="button primary" onClick={() => setDocumentState("loading")}><FileArrowUp />Analisar Documentos com IA</button></div>}
@@ -94,8 +133,9 @@ export default function AccountDrilldown({ account = fallbackAccount, onBack, on
         </article>)}
       </div>}
     </section>
+    </div>}
 
-    <section className="drilldown-card suggestion-analysis" aria-labelledby="suggestion-analysis-title">
+    {activeWorkspace === "suggestions" && <section className="drilldown-card suggestion-analysis workspace-panel" aria-labelledby="suggestion-analysis-title" role="tabpanel">
       <header><h2 id="suggestion-analysis-title"><Sparkle weight="fill" />Sugestões de Conciliação com IA</h2><div>{suggestionState === "ready" && <button className="button ghost" onClick={() => { setSuggestions(initialSuggestions.map((item) => ({ ...item, decision: "pending" }))); setSuggestionState("empty"); }}><ArrowsClockwise />Reiniciar</button>}<button className="button primary" disabled={suggestionState === "loading"} onClick={() => setSuggestionState("loading")}><Sparkle />{suggestionState === "loading" ? "Analisando..." : "Analisar com IA"}</button></div></header>
       {suggestionState === "empty" && <div className="analysis-empty compact"><Sparkle size={42} /><strong>Nenhuma análise realizada</strong><p>Clique em “Analisar com IA” para buscar sugestões de conciliação automaticamente.</p></div>}
       {suggestionState === "loading" && <div className="analysis-empty compact"><SpinnerGap className="spin" size={42} /><strong>Analisando transações divergentes...</strong><p>A IA está comparando valores, datas e descrições para sugerir correspondências.</p></div>}
@@ -110,14 +150,6 @@ export default function AccountDrilldown({ account = fallbackAccount, onBack, on
         </article>)}
       </div>}
     </section>
-
-    <section className="comparison-ledgers" aria-label="Comparação entre razão analítico e sistema financeiro">
-      <Ledger title="Razão Analítico (Contábil)" rows={ledgerRows} icon={<CheckCircle />} actions onInspect={(row) => onToast?.(`Detalhes de ${row.document} abertos.`)} />
-      <Ledger title="Relatório Sistema (Sistema Financeiro)" rows={systemRows} icon={<WarningCircle />} action={<button className="button secondary" onClick={() => onToast?.("Sistema Financeiro aberto em modo demonstrativo.")}><ArrowSquareOut />Abrir Sistema</button>} />
-    </section>
+    }
   </main>;
-}
-
-function Ledger({ title, rows, icon, action, actions = false, onInspect }) {
-  return <section className="drilldown-card ledger-card"><header><h2>{icon}{title}</h2>{action}</header><div className="ledger-wrap"><table><thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th>{actions ? "Ações" : "Status"}</th></tr></thead><tbody>{rows.map((row) => <tr key={`${row.document}-${row.date}`} className={row.status === "OK" ? "matched" : "divergent"}><td><strong>{row.date}</strong><small>{row.document}</small></td><td><strong>{row.description}</strong><small>{row.meta}</small></td><td className="number">{row.value}</td><td><div className="ledger-status-cell"><span className={`status ${row.status === "OK" ? "status--ok" : "status--valor"}`}>{row.status === "OK" ? <CheckCircle weight="fill" /> : <WarningCircle weight="fill" />}{row.status}</span>{actions && <button type="button" className="icon-button" aria-label={`Ações de ${row.document}`} onClick={() => onInspect?.(row)}><DotsThreeVertical weight="bold" /></button>}</div></td></tr>)}</tbody></table></div></section>;
 }

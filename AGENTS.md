@@ -4,6 +4,14 @@ Run the local server yourself and open the preview in the browser available to t
 
 Before making substantial visual changes, use the Product Design plugin's `get-context` skill when the visual source is unclear or no longer matches the current goal. When the user gives durable prototype-specific design feedback, preferences, or decisions, record them in `AGENTS.md`.
 
+## Version boundaries
+
+- This repository is V1. Its Home is the canonical shared Home and may also be reproduced in V2.
+- The V1 detailed comparison is intentionally a new, usability-first proposal. Keep it as a task-oriented workspace with a unified line-by-line comparison, progressive review, document validation, and AI suggestions.
+- V2 represents the current production flow restyled with the Animália/Smart X design system. Do not copy V2's detailed-comparison structure into this repository.
+- Preserve the selected account end to end. Every entry from Home must open the detail with that account's code, name, balances, status, and attachments, and returning must restore the Home flow.
+- Visual similarity in the global shell and Home is expected. Similarity between the V1 and V2 detailed-comparison experiences is a regression.
+
 When implementing from a selected generated mock, treat that image as the source of truth for layout, component anatomy, density, spacing, color, typography, visible content, and hierarchy.
 
 Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts/prepare-sites-build.mjs`, and `tests/sites-worker.test.mjs` intact so the same local prototype can be handed to Sites. Before a Sites handoff, run `npm run build` and `npm run test:sites`; the build must leave `dist/client/index.html`, `dist/server/index.js`, and `dist/.openai/hosting.json`.

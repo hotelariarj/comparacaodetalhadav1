@@ -4,8 +4,19 @@ import { parse } from "@babel/parser";
 
 const sourcePath = new URL("../src/App.jsx", import.meta.url);
 const source = fs.readFileSync(sourcePath, "utf8");
+const drilldownSource = fs.readFileSync(new URL("../src/AccountDrilldown.jsx", import.meta.url), "utf8");
 const ast = parse(source, { sourceType: "module", plugins: ["jsx"] });
 const failures = [];
+
+if (!source.includes("openAccountComparison = (account)") || !source.includes("<AccountDrilldown account={selectedAccount}")) {
+  failures.push("V1 deve repassar a conta escolhida da Home para a comparação detalhada");
+}
+if (!drilldownSource.includes('className="workspace-tabs"') || !drilldownSource.includes("Movimentos pareados")) {
+  failures.push("V1 deve preservar o workspace melhorado e orientado à tarefa");
+}
+if (drilldownSource.includes('className="comparison-ledgers"')) {
+  failures.push("V1 não deve regredir para o detalhe contínuo exclusivo da V2");
+}
 
 function attribute(opening, name) {
   return opening.attributes.find((item) => item.type === "JSXAttribute" && item.name.name === name);

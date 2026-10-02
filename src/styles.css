@@ -19,7 +19,7 @@ a { color: var(--ani-color-brand); }
 .global-header > .header-menu-anchor { margin-left: auto; }
 .header-actions { display: flex; align-items: center; gap: 16px; }
 .global-header .icon-button { color: #fff; }
-.avatar { width: 32px; height: 32px; min-height: 32px; border: 1px solid #8da2ad; border-radius: 50%; background: #e5fcff; color: var(--ani-color-brand); font-weight: 700; cursor: pointer; }
+.avatar { width: 32px; height: 32px; min-height: 32px; flex: 0 0 32px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border: 1px solid #8da2ad; border-radius: 50%; background: #e5fcff; color: var(--ani-color-brand); font-weight: 700; line-height: 1; cursor: pointer; }
 .header-menu-anchor { position: relative; }
 .header-popover { position: absolute; z-index: 90; top: calc(100% + 8px); right: 0; width: 280px; display: grid; gap: 8px; padding: 12px; border: 1px solid var(--ani-color-border); border-radius: 8px; background: #fff; color: var(--ani-color-text); box-shadow: var(--ani-shadow-modal); }
 .header-popover button { min-height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 10px; border: 0; border-radius: 4px; background: transparent; color: var(--ani-color-brand); cursor: pointer; text-align: left; }

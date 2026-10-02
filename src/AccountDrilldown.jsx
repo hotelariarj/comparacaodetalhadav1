@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   ArrowLeft, ArrowSquareOut, ArrowsClockwise, CaretDown, Check, CheckCircle, DotsThreeVertical,
-  FileArrowUp, Info, Sparkle, SpinnerGap, WarningCircle, X,
+  DownloadSimple, FileArrowUp, Info, Paperclip, Sparkle, SpinnerGap, WarningCircle, X,
 } from "@phosphor-icons/react";
 
 const ledgerRows = [
@@ -49,7 +49,9 @@ function useAnalysisState() {
   return [state, setState];
 }
 
-export default function AccountDrilldown({ onBack, onToast, versionLabel = "" }) {
+const fallbackAccount = { code: "1.1.2.001", name: "Banco Conta Movimento", balance: "R$ 850.000,00", systemValue: "R$ 849.200,00", difference: "R$ 800,00", status: "Divergente", tone: "negative", attachments: [] };
+
+export default function AccountDrilldown({ account = fallbackAccount, onBack, onToast, versionLabel = "" }) {
   const [documentState, setDocumentState] = useAnalysisState();
   const [suggestionState, setSuggestionState] = useAnalysisState();
   const [expandedDocument, setExpandedDocument] = useState(null);
@@ -61,18 +63,22 @@ export default function AccountDrilldown({ onBack, onToast, versionLabel = "" })
   };
   const pending = suggestions.filter((item) => item.decision === "pending").length;
   const accepted = suggestions.filter((item) => item.decision === "accepted").length;
+  const selectedAccount = account || fallbackAccount;
+  const isMatched = selectedAccount.tone === "positive";
 
   return <main id="main-content" className="main-content account-drilldown">
-    <nav className="breadcrumb" aria-label="Você está em"><button type="button" onClick={onBack}>Comparação Detalhada</button><span>/</span><span>1.1.01.001 Caixa Geral</span></nav>
+    <nav className="breadcrumb" aria-label="Você está em"><button type="button" onClick={onBack}>Home</button><span>/</span><span>{selectedAccount.code} {selectedAccount.name}</span></nav>
     <section className="drilldown-heading">
       <button type="button" className="icon-button" aria-label="Voltar para comparação" onClick={onBack}><ArrowLeft /></button>
-      <div><div className="heading-line"><h1>Comparação Detalhada</h1>{versionLabel && <span className="analysis-tag success">{versionLabel}</span>}</div><p>1.1.01.001 - Caixa Geral</p></div>
+      <div><div className="heading-line"><h1>Comparação Detalhada</h1>{versionLabel && <span className="analysis-tag success">{versionLabel}</span>}</div><p>{selectedAccount.code} - {selectedAccount.name}</p></div>
     </section>
 
     <section className="drilldown-card account-summary" aria-labelledby="account-summary-title">
       <h2 id="account-summary-title"><FileArrowUp />Resumo da Conta</h2>
-      <dl><div><dt>Saldo Contábil</dt><dd>R$ 150.000,00</dd></div><div><dt>Valor Sistema</dt><dd>R$ 148.500,00</dd></div><div><dt>Diferença</dt><dd className="negative">R$ 1.500,00</dd></div><div><dt>Status</dt><dd><span className="status status--valor"><WarningCircle weight="fill" />Divergente</span></dd></div></dl>
+      <dl><div><dt>Saldo Contábil</dt><dd>{selectedAccount.balance}</dd></div><div><dt>Valor Sistema</dt><dd>{selectedAccount.systemValue}</dd></div><div><dt>Diferença</dt><dd className={isMatched ? "positive" : "negative"}>{selectedAccount.difference}</dd></div><div><dt>Status</dt><dd><span className={`status ${isMatched ? "status--ok" : "status--valor"}`}>{isMatched ? <CheckCircle weight="fill" /> : <WarningCircle weight="fill" />}{selectedAccount.status}</span></dd></div></dl>
     </section>
+
+    {selectedAccount.attachments?.length > 0 && <section className="drilldown-card attached-documents" aria-labelledby="attached-documents-title"><header><h2 id="attached-documents-title"><Paperclip />Documentos Anexados</h2><span>{selectedAccount.attachments.length} documento</span></header>{selectedAccount.attachments.map((document) => <article key={document.name}><div className="attached-document-icon"><FileArrowUp /></div><div><strong>{document.name}</strong><span>{document.size} · {document.date} · {document.author}</span></div><div><button type="button" className="button ghost" onClick={() => onToast?.(`${document.name} aberto para visualização.`)}><ArrowSquareOut />Visualizar</button><button type="button" className="icon-button" aria-label={`Baixar ${document.name}`} onClick={() => onToast?.(`Download de ${document.name} iniciado.`)}><DownloadSimple /></button></div></article>)}</section>}
 
     <section className="drilldown-card document-analysis" aria-labelledby="document-analysis-title">
       <header><h2 id="document-analysis-title"><FileArrowUp />Análise de Documentos com IA</h2>{documentState === "ready" && <button className="button secondary" onClick={() => setDocumentState("loading")}><ArrowsClockwise />Nova análise</button>}</header>

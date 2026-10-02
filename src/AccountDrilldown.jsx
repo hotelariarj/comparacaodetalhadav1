@@ -35,6 +35,14 @@ const initialSuggestions = [
 
 const workspaceOrder = ["comparison", "documents", "suggestions"];
 
+function readReconciliationState(accountCode) {
+  try {
+    return JSON.parse(window.sessionStorage.getItem(`comparison-reconciliation-${accountCode}`)) || {};
+  } catch {
+    return {};
+  }
+}
+
 function buildDocumentResults(attachments, selectedAccount) {
   return attachments.map((attachment, index) => ({
     ...attachment,
@@ -63,14 +71,15 @@ const fallbackAccount = { code: "1.1.2.001", name: "Banco Conta Movimento", bala
 export default function AccountDrilldown({ account = fallbackAccount, initialWorkspace = "comparison", onBack, onToast, versionLabel = "" }) {
   const selectedAccount = account || fallbackAccount;
   const isInitiallyMatched = selectedAccount.tone === "positive";
+  const savedReconciliation = readReconciliationState(selectedAccount.code);
   const [documentState, setDocumentState] = useAnalysisState();
   const [suggestionState, setSuggestionState] = useAnalysisState();
   const [expandedDocument, setExpandedDocument] = useState(null);
   const [expandedMovement, setExpandedMovement] = useState(null);
   const [activeWorkspace, setActiveWorkspace] = useState(initialWorkspace);
   const [focusedSuggestionDoc, setFocusedSuggestionDoc] = useState(null);
-  const [resolvedMovementIds, setResolvedMovementIds] = useState([]);
-  const [suggestions, setSuggestions] = useState(initialSuggestions.map((item) => ({ ...item, decision: "pending" })));
+  const [resolvedMovementIds, setResolvedMovementIds] = useState(savedReconciliation.resolvedMovementIds || []);
+  const [suggestions, setSuggestions] = useState(initialSuggestions.map((item) => ({ ...item, decision: savedReconciliation.decisions?.[item.id] || "pending" })));
   const tabRefs = useRef({});
 
   useEffect(() => {
@@ -84,10 +93,14 @@ export default function AccountDrilldown({ account = fallbackAccount, initialWor
     setExpandedMovement(null);
     setActiveWorkspace(initialWorkspace);
     setFocusedSuggestionDoc(null);
-    setResolvedMovementIds([]);
-    setSuggestions(initialSuggestions.map((item) => ({ ...item, decision: "pending" })));
     if (initialWorkspace === "suggestions" && !isInitiallyMatched) setSuggestionState("ready");
   }, [selectedAccount.code, initialWorkspace, isInitiallyMatched, setDocumentState, setSuggestionState]);
+
+  useEffect(() => {
+    if (isInitiallyMatched) return;
+    const decisions = Object.fromEntries(suggestions.map((item) => [item.id, item.decision]));
+    window.sessionStorage.setItem(`comparison-reconciliation-${selectedAccount.code}`, JSON.stringify({ resolvedMovementIds, decisions }));
+  }, [isInitiallyMatched, resolvedMovementIds, selectedAccount.code, suggestions]);
 
   const decide = (id, decision) => {
     setSuggestions((items) => items.map((item) => item.id === id ? { ...item, decision } : item));
@@ -114,6 +127,7 @@ export default function AccountDrilldown({ account = fallbackAccount, initialWor
   const accountDocuments = buildDocumentResults(selectedAccount.attachments || [], selectedAccount);
   const firstDivergentId = comparisonRows.find((row) => !row.matched)?.id;
   const currentStatus = isComplete ? "Conciliado" : selectedAccount.status;
+  const currentSystemValue = isComplete ? selectedAccount.balance : selectedAccount.systemValue;
   const currentDifference = isComplete ? "R$ 0,00" : selectedAccount.difference;
   const isMatched = isComplete;
 
@@ -150,7 +164,7 @@ export default function AccountDrilldown({ account = fallbackAccount, initialWor
         <div><span className="workspace-eyebrow">{isComplete ? "Conta concluída" : "Conta em revisão"}</span><div className="heading-line"><h1 id="comparison-title">{selectedAccount.name}</h1>{versionLabel && <span className="analysis-tag success">{versionLabel}</span>}</div><p>{selectedAccount.code} · Comparação detalhada</p></div>
       </div>
       <div className="workspace-status" aria-live="polite"><span className={`status ${isComplete ? "status--ok" : "status--valor"}`}>{isComplete ? <CheckCircle weight="fill" /> : <WarningCircle weight="fill" />}{currentStatus}</span><small>Última atualização {selectedAccount.updated || "hoje, 08:12"}</small></div>
-      <dl className="workspace-metrics"><div><dt>Saldo contábil</dt><dd>{selectedAccount.balance}</dd></div><div><dt>Sistema de origem</dt><dd>{selectedAccount.systemValue}</dd></div><div><dt>Diferença a tratar</dt><dd className={isComplete ? "positive" : "negative"}>{currentDifference}</dd></div><div><dt>Progresso</dt><dd>{progressDone} de {progressTotal}</dd><span aria-label={`${progressPercent}% concluído`}><i style={{ width: `${progressPercent}%` }} /></span></div></dl>
+      <dl className="workspace-metrics"><div><dt>Saldo contábil</dt><dd>{selectedAccount.balance}</dd></div><div><dt>Sistema de origem</dt><dd>{currentSystemValue}</dd></div><div><dt>Diferença a tratar</dt><dd className={isComplete ? "positive" : "negative"}>{currentDifference}</dd></div><div><dt>Progresso</dt><dd>{progressDone} de {progressTotal}</dd><span aria-label={`${progressPercent}% concluído`}><i style={{ width: `${progressPercent}%` }} /></span></div></dl>
     </section>
 
     <nav className="workspace-tabs" aria-label="Etapas da análise" role="tablist" onKeyDown={(event) => handleTabKeyDown(event, activeWorkspace)}>

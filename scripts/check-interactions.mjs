@@ -9,18 +9,24 @@ const ast = parse(source, { sourceType: "module", plugins: ["jsx"] });
 const drilldownAst = parse(drilldownSource, { sourceType: "module", plugins: ["jsx"] });
 const failures = [];
 
-if (!source.includes("openAccountComparison = (account)") || !source.includes("<AccountDrilldown account={selectedAccount}")) {
+if (!source.includes("openAccountComparison = (account)") || !source.includes("account={selectedAccount}")) {
   failures.push("V1 deve repassar a conta escolhida da Home para a comparação detalhada");
 }
 if (!source.includes('workspace: "suggestions", account: DEFAULT_ACCOUNT')) {
   failures.push("O atalho de notificações deve abrir as sugestões da conta divergente, sem reutilizar outra conta visitada");
+}
+if (source.includes("Lynn, assistente TOTVS")) {
+  failures.push("O header da V1 não deve exibir o atalho de IA removido");
+}
+if (!source.includes("withStoredAttachments") || !source.includes("comparison-home-attachments")) {
+  failures.push("Anexos da Home devem permanecer disponíveis na rota direta e após recarregar o detalhe");
 }
 for (const legacyMarker of ["summary-card", "desktop-table-wrap", "review-bar", "accountDrilldown"]) {
   if (source.includes(legacyMarker)) {
     failures.push(`V1 não deve manter o fluxo legado compartilhado com a V2: ${legacyMarker}`);
   }
 }
-if (!source.includes('currentNav !== "Comparação Detalhada"') || !source.includes(': <AccountDrilldown account={selectedAccount}')) {
+if (!source.includes('currentNav !== "Comparação Detalhada"') || !/:\s*<AccountDrilldown[^>]*account=\{selectedAccount\}/.test(source)) {
   failures.push("Todo acesso à Comparação Detalhada da V1 deve abrir diretamente o workspace de usabilidade");
 }
 if (!drilldownSource.includes('className="workspace-tabs"') || !drilldownSource.includes("Movimentos pareados")) {
@@ -41,6 +47,9 @@ if (!drilldownSource.includes("movementId") || !/decide\s*=\s*\([^)]*\)[\s\S]*mo
 }
 if (!/resolvedMovementIds|reviewedMovementIds|completedMovementIds/.test(drilldownSource) || !drilldownSource.includes("progressPercent")) {
   failures.push("O progresso deve ser calculado a partir do estado dos movimentos tratados, sem valor fixo");
+}
+if (!drilldownSource.includes("comparison-reconciliation-") || !drilldownSource.includes("currentSystemValue")) {
+  failures.push("Decisões da conciliação e o saldo final do sistema devem permanecer coerentes após navegação e reload");
 }
 if (drilldownSource.includes("<dd>32 de 42</dd>") || drilldownSource.includes('width: "76%"')) {
   failures.push("O resumo da conta não pode manter progresso fixo de 32 de 42 / 76%");

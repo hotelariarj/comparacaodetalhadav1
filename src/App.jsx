@@ -3,7 +3,7 @@ import {
   Bell, CaretDown, CaretRight, ChartBar, Check, CheckCircle,
   ClockCounterClockwise, DotsThreeVertical, DownloadSimple, FileArrowUp, ArrowSquareOut,
   DotsNine, House, List, MapPin, MapTrifold, Paperclip, SidebarSimple,
-  Sparkle, WarningCircle, X,
+  WarningCircle, X,
 } from "@phosphor-icons/react";
 import AccountDrilldown from "./AccountDrilldown";
 
@@ -30,6 +30,12 @@ const readHomeSession = (key, fallback) => {
   } catch {
     return fallback;
   }
+};
+
+const withStoredAttachments = (account) => {
+  const storedAttachments = readHomeSession("comparison-home-attachments", {})[account.code] || [];
+  const attachments = [...(account.attachments || []), ...storedAttachments].filter((item, index, items) => items.findIndex((candidate) => candidate.name === item.name && candidate.date === item.date && candidate.size === item.size) === index);
+  return { ...account, attachments };
 };
 
 function routeFromLocation() {
@@ -86,7 +92,7 @@ function AppShell({ children, currentNav, onNavigate, detailTabOpen }) {
       <IconButton className="mobile-menu-trigger" label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"} onClick={() => setMobileMenuOpen((value) => !value)}>{mobileMenuOpen ? <X size={22} /> : <List size={22} />}</IconButton>
       <img src={`${import.meta.env.BASE_URL}assets/logo-totvs-dark.svg`} alt="TOTVS" />
       <div className="header-menu-anchor"><button type="button" className="environment" aria-label="Trocar ambiente" aria-haspopup="menu" aria-expanded={headerMenu === "environment"} onClick={() => setHeaderMenu(headerMenu === "environment" ? null : "environment")}><span>{environment}</span><strong>Conciliador Contábil</strong><CaretDown size={16} /></button>{headerMenu === "environment" && <div className="header-popover environment-popover" role="menu"><strong>Ambiente</strong>{["Produção", "Homologação"].map((value) => <button type="button" role="menuitemradio" aria-checked={environment === value} key={value} onClick={() => chooseEnvironment(value)}>{environment === value && <Check weight="bold" />}{value}</button>)}</div>}</div>
-      <div className="header-actions"><IconButton label="Aplicativos" onClick={() => navigate("Home")}><DotsNine size={22} /></IconButton><div className="header-menu-anchor"><IconButton label="Notificações" aria-haspopup="dialog" aria-expanded={headerMenu === "notifications"} onClick={() => setHeaderMenu(headerMenu === "notifications" ? null : "notifications")}><Bell size={22} /></IconButton>{headerMenu === "notifications" && <div className="header-popover notification-popover" role="dialog" aria-label="Notificações"><strong>Notificações</strong><p><span className="notification-dot" />A análise inteligente encontrou 5 sugestões.</p><button type="button" onClick={() => { setHeaderMenu(null); navigate("Comparação Detalhada", { workspace: "suggestions", account: DEFAULT_ACCOUNT }); }}>Ver sugestões</button></div>}</div><IconButton className="lynn-action" label="Lynn, assistente TOTVS" onClick={() => window.dispatchEvent(new CustomEvent("smartx-toast", { detail: "Lynn está pronta para ajudar nesta rotina." }))}><Sparkle size={22} /></IconButton><div className="header-menu-anchor"><button type="button" className="avatar" aria-label="Perfil: Rafael R. Oliveira" aria-haspopup="menu" aria-expanded={headerMenu === "profile"} onClick={() => setHeaderMenu(headerMenu === "profile" ? null : "profile")}>RO</button>{headerMenu === "profile" && <div className="header-popover profile-popover" role="menu"><strong>Rafael R. Oliveira</strong><span>Administrador</span><button type="button" role="menuitem" onClick={() => { setHeaderMenu(null); window.dispatchEvent(new CustomEvent("smartx-toast", { detail: "Preferências do perfil abertas." })); }}>Preferências</button></div>}</div></div>
+      <div className="header-actions"><IconButton label="Aplicativos" onClick={() => navigate("Home")}><DotsNine size={22} /></IconButton><div className="header-menu-anchor"><IconButton label="Notificações" aria-haspopup="dialog" aria-expanded={headerMenu === "notifications"} onClick={() => setHeaderMenu(headerMenu === "notifications" ? null : "notifications")}><Bell size={22} /></IconButton>{headerMenu === "notifications" && <div className="header-popover notification-popover" role="dialog" aria-label="Notificações"><strong>Notificações</strong><p><span className="notification-dot" />A análise inteligente encontrou 5 sugestões.</p><button type="button" onClick={() => { setHeaderMenu(null); navigate("Comparação Detalhada", { workspace: "suggestions", account: DEFAULT_ACCOUNT }); }}>Ver sugestões</button></div>}</div><div className="header-menu-anchor"><button type="button" className="avatar" aria-label="Perfil: Rafael R. Oliveira" aria-haspopup="menu" aria-expanded={headerMenu === "profile"} onClick={() => setHeaderMenu(headerMenu === "profile" ? null : "profile")}>RO</button>{headerMenu === "profile" && <div className="header-popover profile-popover" role="menu"><strong>Rafael R. Oliveira</strong><span>Administrador</span><button type="button" role="menuitem" onClick={() => { setHeaderMenu(null); window.dispatchEvent(new CustomEvent("smartx-toast", { detail: "Preferências do perfil abertas." })); }}>Preferências</button></div>}</div></div>
     </header>
     <nav className="product-tabs" aria-label="Abas abertas">{tabs.map((tab) => {
       const destination = tab === "Conciliações" ? "Home" : tab;
@@ -127,7 +133,7 @@ function AppShell({ children, currentNav, onNavigate, detailTabOpen }) {
 export function App() {
   const [currentNav, setCurrentNav] = useState(() => routeFromLocation().currentNav);
   const [detailTabOpen, setDetailTabOpen] = useState(() => routeFromLocation().currentNav === "Comparação Detalhada");
-  const [selectedAccount, setSelectedAccount] = useState(() => findAccountByCode(routeFromLocation().accountCode) || DEFAULT_ACCOUNT);
+  const [selectedAccount, setSelectedAccount] = useState(() => withStoredAttachments(findAccountByCode(routeFromLocation().accountCode) || DEFAULT_ACCOUNT));
   const [detailWorkspace, setDetailWorkspace] = useState(() => routeFromLocation().workspace || "comparison");
   const [homeView, setHomeView] = useState("patrimonial");
   const [homeExpandedGroups, setHomeExpandedGroups] = useState(new Set(["current-assets"]));
@@ -148,7 +154,7 @@ export function App() {
       setCurrentNav(route.currentNav);
       setDetailTabOpen(route.currentNav === "Comparação Detalhada");
       setDetailWorkspace(route.workspace || "comparison");
-      if (route.accountCode) setSelectedAccount(findAccountByCode(route.accountCode) || DEFAULT_ACCOUNT);
+      if (route.accountCode) setSelectedAccount(withStoredAttachments(findAccountByCode(route.accountCode) || DEFAULT_ACCOUNT));
     };
     window.addEventListener("popstate", restoreRoute);
     return () => window.removeEventListener("popstate", restoreRoute);
@@ -164,7 +170,7 @@ export function App() {
       return;
     }
     if (destination === "Comparação Detalhada") {
-      const targetAccount = options.account || selectedAccount || DEFAULT_ACCOUNT;
+      const targetAccount = withStoredAttachments(options.account || selectedAccount || DEFAULT_ACCOUNT);
       setDetailTabOpen(true);
       setSelectedAccount(targetAccount);
       setDetailWorkspace(options.workspace || "comparison");
@@ -176,7 +182,7 @@ export function App() {
     writeRoute(destination, selectedAccount || DEFAULT_ACCOUNT, options.workspace || "comparison");
   };
   const openAccountComparison = (account) => {
-    setSelectedAccount(account || DEFAULT_ACCOUNT);
+    setSelectedAccount(withStoredAttachments(account || DEFAULT_ACCOUNT));
     setDetailWorkspace("comparison");
     setDetailTabOpen(true);
     setCurrentNav("Comparação Detalhada");
@@ -184,7 +190,7 @@ export function App() {
   };
 
   return <AppShell currentNav={currentNav} onNavigate={navigateTo} detailTabOpen={detailTabOpen}>
-    {currentNav === "Home" ? <HomeDashboard view={homeView} onViewChange={setHomeView} expandedGroups={homeExpandedGroups} onExpandedGroupsChange={setHomeExpandedGroups} approvedAccounts={homeApprovedAccounts} onApprovedAccountsChange={setHomeApprovedAccounts} sessionAttachments={homeSessionAttachments} onSessionAttachmentsChange={setHomeSessionAttachments} dailySystem={homeDailySystem} onDailySystemChange={setHomeDailySystem} dailyStatus={homeDailyStatus} onDailyStatusChange={setHomeDailyStatus} onOpenComparison={openAccountComparison} onToast={setToast} /> : currentNav !== "Comparação Detalhada" ? <ModulePage name={currentNav} onBack={() => navigateTo("Home")} /> : <AccountDrilldown account={selectedAccount} initialWorkspace={detailWorkspace} onBack={() => navigateTo("Home")} onToast={setToast} />}
+    {currentNav === "Home" ? <HomeDashboard view={homeView} onViewChange={setHomeView} expandedGroups={homeExpandedGroups} onExpandedGroupsChange={setHomeExpandedGroups} approvedAccounts={homeApprovedAccounts} onApprovedAccountsChange={setHomeApprovedAccounts} sessionAttachments={homeSessionAttachments} onSessionAttachmentsChange={setHomeSessionAttachments} dailySystem={homeDailySystem} onDailySystemChange={setHomeDailySystem} dailyStatus={homeDailyStatus} onDailyStatusChange={setHomeDailyStatus} onOpenComparison={openAccountComparison} onToast={setToast} /> : currentNav !== "Comparação Detalhada" ? <ModulePage name={currentNav} onBack={() => navigateTo("Home")} /> : <AccountDrilldown key={selectedAccount.code} account={selectedAccount} initialWorkspace={detailWorkspace} onBack={() => navigateTo("Home")} onToast={setToast} />}
     {toast && <div className="toast" role="status"><CheckCircle weight="fill" /><span>{toast}</span><IconButton label="Fechar notificação" onClick={() => setToast("")}><X /></IconButton></div>}
   </AppShell>;
 }

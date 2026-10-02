@@ -81,6 +81,7 @@ export default function AccountDrilldown({ account = fallbackAccount, initialWor
   const [resolvedMovementIds, setResolvedMovementIds] = useState(savedReconciliation.resolvedMovementIds || []);
   const [suggestions, setSuggestions] = useState(initialSuggestions.map((item) => ({ ...item, decision: savedReconciliation.decisions?.[item.id] || "pending" })));
   const tabRefs = useRef({});
+  const movementReviewActionRefs = useRef({});
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -130,6 +131,16 @@ export default function AccountDrilldown({ account = fallbackAccount, initialWor
   const currentSystemValue = isComplete ? selectedAccount.balance : selectedAccount.systemValue;
   const currentDifference = isComplete ? "R$ 0,00" : selectedAccount.difference;
   const isMatched = isComplete;
+
+  const startReview = () => {
+    if (!firstDivergentId) return;
+    setExpandedMovement(firstDivergentId);
+    window.requestAnimationFrame(() => {
+      const nextAction = movementReviewActionRefs.current[firstDivergentId];
+      nextAction?.scrollIntoView({ behavior: "smooth", block: "center" });
+      nextAction?.focus({ preventScroll: true });
+    });
+  };
 
   const activateWorkspace = (workspace, focus = false) => {
     setActiveWorkspace(workspace);
@@ -181,7 +192,7 @@ export default function AccountDrilldown({ account = fallbackAccount, initialWor
       {!isMatched && <aside className="review-priority" aria-labelledby="review-priority-title">
         <span><WarningCircle weight="fill" /></span>
         <div><small>PRÓXIMA AÇÃO RECOMENDADA</small><h2 id="review-priority-title">{divergentMovements === 1 ? "Revise o movimento divergente" : `Revise os ${divergentMovements} movimentos divergentes`}</h2><p>Comece pelos lançamentos com o mesmo documento e valores diferentes. Eles costumam ser resolvidos mais rapidamente.</p></div>
-        <button type="button" className="button primary" aria-controls={`movement-review-${firstDivergentId}`} onClick={() => setExpandedMovement(firstDivergentId)}>Começar revisão</button>
+        <button type="button" className="button primary" aria-controls={`movement-review-${firstDivergentId}`} onClick={startReview}>Começar revisão</button>
       </aside>}
 
       <section className="unified-comparison" aria-labelledby="movements-title">
@@ -194,7 +205,7 @@ export default function AccountDrilldown({ account = fallbackAccount, initialWor
           <td><button type="button" className="button ghost compact-button" aria-controls={`movement-review-${row.id}`} aria-expanded={expandedMovement === row.id} onClick={() => setExpandedMovement(expandedMovement === row.id ? null : row.id)}>{expandedMovement === row.id ? "Fechar" : "Revisar"}</button></td>
         </tr>).flatMap((row, index) => {
           const data = comparisonRows[index];
-          return expandedMovement === data.id ? [row, <tr id={`movement-review-${data.id}`} className="movement-review-row" key={`${data.id}-review`}><td colSpan="5"><div><span><Info weight="fill" /></span><p><strong>{data.matched ? "Movimento já conciliado" : "Possível diferença de lançamento"}</strong>{data.matched ? "Os valores, datas e documentos coincidem nas duas fontes." : "Documento e data são compatíveis. Confira o valor e escolha uma sugestão de conciliação para concluir."}</p>{!data.matched && <button type="button" className="button secondary" onClick={() => openSuggestionsFor(data.id)}>Ver sugestão</button>}</div></td></tr>] : [row]; })}</tbody></table></div>
+          return expandedMovement === data.id ? [row, <tr id={`movement-review-${data.id}`} className="movement-review-row" key={`${data.id}-review`}><td colSpan="5"><div><span><Info weight="fill" /></span><p><strong>{data.matched ? "Movimento já conciliado" : "Possível diferença de lançamento"}</strong>{data.matched ? "Os valores, datas e documentos coincidem nas duas fontes." : "Documento e data são compatíveis. Confira o valor e escolha uma sugestão de conciliação para concluir."}</p>{!data.matched && <button ref={(node) => { movementReviewActionRefs.current[data.id] = node; }} type="button" className="button secondary" onClick={() => openSuggestionsFor(data.id)}>Ver sugestão</button>}</div></td></tr>] : [row]; })}</tbody></table></div>
       </section>
     </section>}
 

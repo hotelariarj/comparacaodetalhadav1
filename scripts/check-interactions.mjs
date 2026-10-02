@@ -51,6 +51,9 @@ if (!/resolvedMovementIds|reviewedMovementIds|completedMovementIds/.test(drilldo
 if (!drilldownSource.includes("comparison-reconciliation-") || !drilldownSource.includes("currentSystemValue")) {
   failures.push("Decisões da conciliação e o saldo final do sistema devem permanecer coerentes após navegação e reload");
 }
+if (!drilldownSource.includes("movementReviewActionRefs") || !drilldownSource.includes("scrollIntoView") || !drilldownSource.includes("preventScroll")) {
+  failures.push("Começar revisão deve abrir a primeira divergência, trazê-la para a área visível e focar a próxima ação");
+}
 if (drilldownSource.includes("<dd>32 de 42</dd>") || drilldownSource.includes('width: "76%"')) {
   failures.push("O resumo da conta não pode manter progresso fixo de 32 de 42 / 76%");
 }

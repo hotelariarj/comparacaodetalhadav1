@@ -11,6 +11,14 @@ const failures = [];
 if (!source.includes("openAccountComparison = (account)") || !source.includes("<AccountDrilldown account={selectedAccount}")) {
   failures.push("V1 deve repassar a conta escolhida da Home para a comparação detalhada");
 }
+for (const legacyMarker of ["summary-card", "desktop-table-wrap", "review-bar", "accountDrilldown"]) {
+  if (source.includes(legacyMarker)) {
+    failures.push(`V1 não deve manter o fluxo legado compartilhado com a V2: ${legacyMarker}`);
+  }
+}
+if (!source.includes('currentNav !== "Comparação Detalhada"') || !source.includes(': <AccountDrilldown account={selectedAccount}')) {
+  failures.push("Todo acesso à Comparação Detalhada da V1 deve abrir diretamente o workspace de usabilidade");
+}
 if (!drilldownSource.includes('className="workspace-tabs"') || !drilldownSource.includes("Movimentos pareados")) {
   failures.push("V1 deve preservar o workspace melhorado e orientado à tarefa");
 }

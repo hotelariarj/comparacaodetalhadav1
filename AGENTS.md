@@ -8,6 +8,7 @@ Before making substantial visual changes, use the Product Design plugin's `get-c
 
 - This repository is V1. Its Home is the canonical shared Home and may also be reproduced in V2.
 - The V1 detailed comparison is intentionally a new, usability-first proposal. Keep it as a task-oriented workspace with a unified line-by-line comparison, progressive review, document validation, and AI suggestions.
+- V1 has exactly one detailed-comparison implementation: `AccountDrilldown.jsx`. Every entry point—including the journey menu, product tab, notifications, and account-card actions—must route to that workspace. Do not add a second aggregate or V2-style comparison block to `App.jsx`.
 - V2 represents the current production flow restyled with the Animália/Smart X design system. Do not copy V2's detailed-comparison structure into this repository.
 - Preserve the selected account end to end. Every entry from Home must open the detail with that account's code, name, balances, status, and attachments, and returning must restore the Home flow.
 - Visual similarity in the global shell and Home is expected. Similarity between the V1 and V2 detailed-comparison experiences is a regression.

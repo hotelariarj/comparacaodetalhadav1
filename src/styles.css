@@ -410,6 +410,15 @@ td code { color: var(--ani-color-text); font-family: ui-monospace, SFMono-Regula
 .module-hero p { margin: 5px 0 0; color: var(--ani-color-text-secondary); }
 .module-placeholder { max-width: 680px; display: grid; justify-items: start; gap: 10px; padding: 24px; border: 1px solid var(--ani-color-border); border-radius: 8px; background: #fff; }
 .module-placeholder p { margin: 0 0 6px; color: var(--ani-color-text-secondary); }
+.access-audit-panel { min-width: 0; border: 1px solid var(--ani-color-border-soft); border-radius: var(--ani-radius-card); background: var(--ani-color-surface); box-shadow: var(--ani-shadow-sm); overflow: hidden; }
+.access-audit-panel > header { min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--ani-color-border-soft); }
+.access-audit-panel h2 { margin: 0; font-size: var(--ani-font-size-title-sm); }
+.access-audit-panel > header > span { color: var(--ani-color-text-secondary); font-size: var(--ani-font-size-label); }
+.access-audit-table-wrap { overflow-x: auto; }
+.access-audit-table-wrap table { width: 100%; min-width: 760px; border-collapse: collapse; font-size: var(--ani-font-size-label); }
+.access-audit-table-wrap th, .access-audit-table-wrap td { padding: 12px 16px; border-bottom: 1px solid var(--ani-color-border-soft); text-align: left; vertical-align: top; }
+.access-audit-table-wrap th { background: var(--ani-color-table-header); font-weight: var(--ani-font-weight-semibold); }
+.access-audit-empty { margin: 0; padding: 24px 16px; color: var(--ani-color-text-secondary); }
 .toast { position: fixed; z-index: 150; right: 22px; bottom: 92px; max-width: min(410px, calc(100vw - 32px)); display: flex; align-items: center; gap: 10px; padding: 10px 10px 10px 14px; border: 1px solid var(--ani-color-border); border-left: 4px solid var(--ani-color-positive); border-radius: var(--ani-radius-control); background: #fff; box-shadow: var(--ani-shadow-md); }
 .toast > svg { flex: 0 0 auto; color: var(--ani-color-positive); font-size: 22px; }
 .toast span { flex: 1; }

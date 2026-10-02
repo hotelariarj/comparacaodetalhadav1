@@ -145,12 +145,14 @@ export function App() {
   const [homeSessionAttachments, setHomeSessionAttachments] = useState(() => readHomeSession("comparison-home-attachments", {}));
   const [homeDailySystem, setHomeDailySystem] = useState("Todos os Sistemas");
   const [homeDailyStatus, setHomeDailyStatus] = useState("Todos");
+  const [accessAuditEvents, setAccessAuditEvents] = useState(() => readHomeSession("access-audit-events", []));
   const [toast, setToast] = useState("");
 
   useEffect(() => { const listener = (event) => setToast(event.detail); window.addEventListener("smartx-toast", listener); return () => window.removeEventListener("smartx-toast", listener); }, []);
   useEffect(() => { if (!toast) return; const timer = setTimeout(() => setToast(""), 3600); return () => clearTimeout(timer); }, [toast]);
   useEffect(() => { window.sessionStorage.setItem("comparison-home-approved", JSON.stringify([...homeApprovedAccounts])); }, [homeApprovedAccounts]);
   useEffect(() => { window.sessionStorage.setItem("comparison-home-attachments", JSON.stringify(homeSessionAttachments)); }, [homeSessionAttachments]);
+  useEffect(() => { window.sessionStorage.setItem("access-audit-events", JSON.stringify(accessAuditEvents)); }, [accessAuditEvents]);
   useEffect(() => {
     if (!window.location.hash) writeRoute("Home", null, "comparison", true);
     const restoreRoute = () => {
@@ -192,9 +194,14 @@ export function App() {
     setCurrentNav("Comparação Detalhada");
     writeRoute("Comparação Detalhada", account || DEFAULT_ACCOUNT);
   };
+  const recordAccessAudit = (entry) => setAccessAuditEvents((events) => [{
+    ...entry,
+    id: `${Date.now()}-${events.length}`,
+    occurredAt: new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "medium" }).format(new Date()),
+  }, ...events]);
 
   return <AppShell currentNav={currentNav} onNavigate={navigateTo} detailTabOpen={detailTabOpen}>
-    {currentNav === "Home" ? <HomeDashboard view={homeView} onViewChange={setHomeView} expandedGroups={homeExpandedGroups} onExpandedGroupsChange={setHomeExpandedGroups} approvedAccounts={homeApprovedAccounts} onApprovedAccountsChange={setHomeApprovedAccounts} sessionAttachments={homeSessionAttachments} onSessionAttachmentsChange={setHomeSessionAttachments} dailySystem={homeDailySystem} onDailySystemChange={setHomeDailySystem} dailyStatus={homeDailyStatus} onDailyStatusChange={setHomeDailyStatus} onOpenComparison={openAccountComparison} onToast={setToast} /> : currentNav === "Cadastros" ? <ReconciliationRegistries onToast={setToast} /> : currentNav !== "Comparação Detalhada" ? (currentNav === "Controle de Acesso" ? <AccessControl onToast={setToast} /> : <ModulePage name={currentNav} onBack={() => navigateTo("Home")} />) : <AccountDrilldown key={selectedAccount.code} account={selectedAccount} initialWorkspace={detailWorkspace} onBack={() => navigateTo("Home")} onToast={setToast} />}
+    {currentNav === "Home" ? <HomeDashboard view={homeView} onViewChange={setHomeView} expandedGroups={homeExpandedGroups} onExpandedGroupsChange={setHomeExpandedGroups} approvedAccounts={homeApprovedAccounts} onApprovedAccountsChange={setHomeApprovedAccounts} sessionAttachments={homeSessionAttachments} onSessionAttachmentsChange={setHomeSessionAttachments} dailySystem={homeDailySystem} onDailySystemChange={setHomeDailySystem} dailyStatus={homeDailyStatus} onDailyStatusChange={setHomeDailyStatus} onOpenComparison={openAccountComparison} onToast={setToast} /> : currentNav === "Cadastros" ? <ReconciliationRegistries onToast={setToast} /> : currentNav !== "Comparação Detalhada" ? (currentNav === "Controle de Acesso" ? <AccessControl onToast={setToast} onAudit={recordAccessAudit} /> : <ModulePage name={currentNav} auditEvents={accessAuditEvents} onBack={() => navigateTo("Home")} />) : <AccountDrilldown key={selectedAccount.code} account={selectedAccount} initialWorkspace={detailWorkspace} onBack={() => navigateTo("Home")} onToast={setToast} />}
     {toast && <div className="toast" role="status"><CheckCircle weight="fill" /><span>{toast}</span><IconButton label="Fechar notificação" onClick={() => setToast("")}><X /></IconButton></div>}
   </AppShell>;
 }
@@ -368,9 +375,9 @@ function ApproveAnalysisDialog({ account, approved, onClose, onConfirm }) {
   return <div className="overlay modal-overlay home-flow-overlay" onMouseDown={(event) => event.target === event.currentTarget && onClose()}><section className="home-flow-dialog home-approve-dialog" role="dialog" aria-modal="true" aria-labelledby="approve-dialog-title"><header><div><small>Análise da conta</small><h2 id="approve-dialog-title">{account.name}</h2></div><IconButton label="Fechar" onClick={onClose}><X /></IconButton></header><div className="home-flow-body"><div className={`approval-message ${approved ? "approved" : ""}`}>{approved ? <CheckCircle size={34} weight="fill" /> : <WarningCircle size={34} weight="fill" />}<div><strong>{approved ? "Análise já aprovada" : "Aprovar esta análise?"}</strong><p>{approved ? "Esta conta já foi revisada e aprovada nesta sessão." : `Você confirma os saldos, documentos e divergências apresentados para ${account.code}?`}</p></div></div><dl className="approval-summary"><div><dt>Saldo contábil</dt><dd>{account.balance}</dd></div><div><dt>Diferença</dt><dd>{account.difference}</dd></div><div><dt>Status atual</dt><dd>{account.status}</dd></div></dl></div><footer><button type="button" className="button secondary" onClick={onClose}>{approved ? "Fechar" : "Cancelar"}</button>{!approved && <button type="button" className="button primary" onClick={onConfirm}><CheckCircle />Confirmar aprovação</button>}</footer></section></div>;
 }
 
-function ModulePage({ name, onBack }) {
+function ModulePage({ name, onBack, auditEvents = [] }) {
   const item = navItems.find((entry) => entry.label === name) || navItems[0];
   const Icon = item.icon;
-  const descriptions = { Home: "Visão geral das conciliações e pendências do projeto.", "Logs de Auditoria": "Histórico rastreável das ações realizadas na conciliação.", Cadastros: "Contas, regras e fontes de dados usadas pelo conciliador.", "Mapa do Projeto": "Estrutura das etapas e integrações do projeto." };
-  return <main id="main-content" className="main-content module-page"><nav className="breadcrumb"><button type="button" onClick={onBack}>Home</button><CaretRight /><span>{name}</span></nav><section className="module-hero"><Icon size={34} weight="duotone" /><div><h1>{name}</h1><p>{descriptions[name]}</p></div></section><section className="module-placeholder"><strong>Módulo acessível</strong><p>Este destino está conectado ao menu do protótipo. Volte à Home para continuar o fluxo principal.</p><button type="button" className="button primary" onClick={onBack}>Voltar para Home</button></section></main>;
+  const descriptions = { Home: "Visão geral das conciliações e pendências do projeto.", "Logs de Auditoria": "Ações de Controle de Acesso registradas nesta sessão do protótipo.", Cadastros: "Contas, regras e fontes de dados usadas pelo conciliador.", "Mapa do Projeto": "Estrutura das etapas e integrações do projeto." };
+  return <main id="main-content" className="main-content module-page"><nav className="breadcrumb"><button type="button" onClick={onBack}>Home</button><CaretRight /><span>{name}</span></nav><section className="module-hero"><Icon size={34} weight="duotone" /><div><h1>{name}</h1><p>{descriptions[name]}</p></div></section>{name === "Logs de Auditoria" ? <section className="access-audit-panel" aria-label="Eventos desta sessão"><header><h2>Eventos desta sessão</h2><span>{auditEvents.length} {auditEvents.length === 1 ? "evento" : "eventos"}</span></header>{auditEvents.length ? <div className="access-audit-table-wrap"><table><thead><tr><th>Data e hora</th><th>Ação</th><th>Conta ou grupo</th><th>Detalhe</th></tr></thead><tbody>{auditEvents.map((event) => <tr key={event.id}><td>{event.occurredAt}</td><td>{event.action}</td><td>{event.subject}</td><td>{event.detail}</td></tr>)}</tbody></table></div> : <p className="access-audit-empty">As alterações de acesso feitas durante esta sessão aparecerão aqui.</p>}</section> : <section className="module-placeholder"><strong>Módulo acessível</strong><p>Este destino está conectado ao menu do protótipo. Volte à Home para continuar o fluxo principal.</p><button type="button" className="button primary" onClick={onBack}>Voltar para Home</button></section>}</main>;
 }

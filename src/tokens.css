@@ -8,6 +8,17 @@
 
 :root {
   --ani-font-family: "TOTVS Pro", "Open Sans", Arial, sans-serif;
+  --ani-font-weight-regular: 400;
+  --ani-font-weight-medium: 500;
+  --ani-font-weight-semibold: 600;
+  --ani-font-weight-bold: 700;
+  --ani-font-size-micro: 10px;
+  --ani-font-size-caption: 11px;
+  --ani-font-size-label: 12px;
+  --ani-font-size-body-sm: 13px;
+  --ani-font-size-body: 14px;
+  --ani-font-size-title-sm: 17px;
+  --ani-font-size-title: 22px;
   --ani-color-brand: #00445b;
   --ani-color-brand-hover: #002f40;
   --ani-color-brand-strong: #000e19;
@@ -29,6 +40,25 @@
   --ani-color-negative: #9b2d27;
   --ani-color-negative-bg: #f6e6e5;
   --ani-color-info-bg: #e5fcff;
+  --ani-color-info-border: #9eeaf3;
+  --ani-color-info-track: #c4f1f6;
+  --ani-color-control-border: #7f8c99;
+  --ani-color-on-brand: #ffffff;
+  --ani-color-warning-pill-text: #74540f;
+  --ani-color-warning-hover: #ffe9b1;
+  --ani-color-negative-hover: #8f2622;
+  --ani-color-deadline-border: #a887c7;
+  --ani-color-deadline-surface: #f7efff;
+  --ani-color-deadline-text: #5b347f;
+  --ani-color-table-header: #dfe7f2;
+  --ani-color-row-alt: #fbfcfe;
+  --ani-color-row-hover: #edfaff;
+  --ani-color-row-selected: #e5fcff;
+  --ani-color-warning-border: #ead5a4;
+  --ani-color-warning-surface: #fff6df;
+  --ani-color-warning-text: #5a4215;
+  --ani-color-warning-control-border: #927334;
+  --ani-color-warning-control-text: #604814;
   --ani-space-1: 4px;
   --ani-space-2: 8px;
   --ani-space-3: 12px;

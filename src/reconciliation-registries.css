@@ -15,6 +15,9 @@
 .registry-tabs button { position: relative; min-width: max-content; padding: 0 16px; border: 0; background: transparent; color: var(--ani-color-text-secondary); font-weight: 650; cursor: pointer; }
 .registry-tabs button.active { color: var(--ani-color-brand); }
 .registry-tabs button.active::after { content: ""; position: absolute; right: 8px; bottom: -1px; left: 8px; height: 2px; background: var(--ani-color-brand); }
+.registry-help-inline { min-height: 44px; display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-bottom: 1px solid var(--ani-color-border-soft); background: var(--ani-color-surface-subtle); color: var(--ani-color-text-secondary); font-size: 12px; }
+.registry-help-inline > svg { flex: 0 0 auto; color: var(--ani-color-brand); }
+.registry-help-inline button { width: 32px; height: 32px; min-height: 32px; display: grid; place-items: center; margin-left: auto; border: 0; background: transparent; color: var(--ani-color-brand); cursor: pointer; }
 .registry-card { min-width: 0; border: 1px solid var(--ani-color-border-soft); border-radius: 8px; background: #fff; box-shadow: var(--ani-shadow-sm); overflow: visible; }
 .registry-toolbar { min-height: 76px; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--ani-color-border-soft); }
 .registry-search { width: min(100%, 390px); height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid #7f8c99; border-radius: 8px; color: var(--ani-color-text-secondary); }
@@ -85,16 +88,18 @@
 .registry-summary-row .button { min-height: 36px; }
 .registry-summary-link { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; padding: 0 14px; border: 0; background: #fff; color: var(--ani-color-brand); font-weight: 650; cursor: pointer; }
 .registry-summary-link:hover { background: var(--ani-color-surface-subtle); }
-.registry-undo-toast { position: fixed; z-index: 95; right: 18px; bottom: 92px; min-height: 52px; display: flex; align-items: center; gap: 9px; padding: 8px 12px; border: 1px solid var(--ani-color-border); border-radius: 8px; background: #fff; color: var(--ani-color-text); box-shadow: var(--ani-shadow-md); font-size: 12px; }
+.registry-undo-toast { min-height: 48px; display: flex; align-items: center; gap: 9px; padding: 6px 12px; border: 1px solid var(--ani-color-border); border-radius: 8px; background: #fff; color: var(--ani-color-text); box-shadow: var(--ani-shadow-sm); font-size: 12px; }
+.registry-undo-toast > span { margin-right: auto; }
 .registry-undo-toast > svg { color: var(--ani-color-positive); }
 .registry-undo-toast button { display: inline-flex; align-items: center; gap: 4px; padding: 5px 8px; border: 0; border-radius: 4px; background: transparent; color: var(--ani-color-brand); font-weight: 650; cursor: pointer; }
 .registry-ai { position: fixed; z-index: 35; right: 24px; bottom: 24px; min-width: 72px; height: 54px; border: 0; border-radius: 28px; background: var(--ani-color-brand); color: #fff; box-shadow: var(--ani-shadow-md); font-size: 16px; font-weight: 650; cursor: pointer; }
 .registry-overlay { position: fixed; z-index: 120; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(9, 26, 34, .46); }
-.registry-link-modal { width: min(940px, 100%); max-height: min(92vh, 880px); display: flex; flex-direction: column; border-radius: 8px; background: #fff; box-shadow: var(--ani-shadow-modal); overflow: hidden; }
-.registry-link-modal > header { min-height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 18px 12px 22px; border-bottom: 1px solid var(--ani-color-border); }
-.registry-link-modal > header small, .registry-government-pair > small { color: var(--ani-color-text-muted); font-size: 10px; letter-spacing: .05em; font-weight: 650; }
-.registry-link-modal h2, .registry-confirm-modal h2 { margin: 2px 0 0; font-size: 21px; }
-.registry-modal-body { flex: 1; display: grid; grid-template-columns: minmax(260px, .9fr) minmax(360px, 1.2fr); gap: 14px; padding: 16px; overflow-y: auto; }
+.registry-side-overlay { justify-content: flex-end; padding: 0; }
+.registry-link-side-modal { width: min(760px, 100%); height: 100vh; height: 100dvh; display: flex; flex-direction: column; background: #fff; box-shadow: var(--ani-shadow-modal); overflow: hidden; }
+.registry-link-side-modal > header { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 18px 12px 24px; border-bottom: 1px solid var(--ani-color-border); }
+.registry-link-side-modal > header small, .registry-government-pair > small { color: var(--ani-color-text-muted); font-size: 10px; letter-spacing: .05em; font-weight: 650; }
+.registry-link-side-modal h2, .registry-confirm-modal h2 { margin: 2px 0 0; font-size: 21px; }
+.registry-modal-body { flex: 1; display: grid; grid-template-columns: 1fr; align-content: start; gap: 14px; padding: 18px 24px; overflow-y: auto; }
 .registry-modal-body > section { min-width: 0; padding: 14px; border: 1px solid var(--ani-color-border-soft); border-radius: 8px; }
 .registry-government-pair { grid-column: 1 / -1; display: grid; gap: 10px; background: #f9fbfd; }
 .registry-government-pair > div { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; }
@@ -124,9 +129,9 @@
 .registry-report-list { flex: 1; display: grid; align-content: start; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px 6px; margin-top: 7px; }
 .registry-report-list label { min-height: 30px; display: flex; align-items: center; gap: 6px; color: var(--ani-color-text-secondary); font-size: 10px; }
 .registry-validation { display: flex; align-items: center; gap: 6px; margin: 9px 0 0; color: var(--ani-color-warning); font-size: 11px; }
-.registry-link-modal > footer { min-height: 60px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--ani-color-border); }
-.registry-link-modal > footer > span { margin-right: auto; color: var(--ani-color-text-secondary); font-size: 11px; }
-.registry-link-modal > footer .button { min-height: 40px; }
+.registry-link-side-modal > footer { min-height: 72px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 12px 24px; border-top: 1px solid var(--ani-color-border); background: #fff; }
+.registry-link-side-modal > footer > span { margin-right: auto; color: var(--ani-color-text-secondary); font-size: 11px; }
+.registry-link-side-modal > footer .button { min-height: 44px; }
 .registry-modal-overlay { z-index: 125; }
 .registry-confirm-modal { width: min(550px, 100%); border-radius: 8px; background: #fff; box-shadow: var(--ani-shadow-modal); overflow: hidden; }
 .registry-confirm-modal > header { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; padding: 18px 18px 14px 22px; border-bottom: 1px solid var(--ani-color-border); }
@@ -145,7 +150,6 @@
   .registry-search { flex: 1 1 300px; }
   .registry-source-filters { order: 3; flex-basis: 100%; }
   .registry-summary-grid { grid-template-columns: 1fr; }
-  .registry-modal-body { grid-template-columns: 1fr; }
   .registry-government-pair { grid-column: auto; }
 }
 @media (max-width: 640px) {
@@ -165,13 +169,14 @@
   .registry-bulk-bar > span { flex: 1 1 100%; }
   .registry-summary-row { align-items: flex-start; }
   .registry-summary-row .button { padding-inline: 7px; font-size: 11px; }
-  .registry-link-modal > header { min-height: 62px; }
+  .registry-link-side-modal > header { min-height: 62px; }
   .registry-modal-body { padding: 10px; }
   .registry-government-pair > div { grid-template-columns: 1fr; gap: 8px; }
   .registry-government-pair > div > b { display: none; }
   .registry-report-list { grid-template-columns: 1fr; }
-  .registry-link-modal > footer { flex-wrap: wrap; }
-  .registry-link-modal > footer > span { flex-basis: 100%; }
-  .registry-undo-toast { right: 10px; bottom: 84px; left: 10px; justify-content: space-between; }
+  .registry-link-side-modal > footer { flex-wrap: wrap; padding: 10px 14px; }
+  .registry-link-side-modal > footer > span { flex-basis: 100%; }
+  .registry-undo-toast { flex-wrap: wrap; }
+  .registry-undo-toast > span { flex-basis: calc(100% - 34px); }
   .registry-ai { right: 14px; bottom: 14px; }
 }

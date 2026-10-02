@@ -80,7 +80,7 @@ function AppShell({ children, currentNav, onNavigate, detailTabOpen }) {
     window.dispatchEvent(new CustomEvent("smartx-toast", { detail: `Ambiente alterado para ${value}.` }));
   };
   const navigate = (label, options) => { onNavigate(label, options); setMobileMenuOpen(false); };
-  const tabs = ["TOTVS News", "Meu TOTVS", "Conciliações", ...(detailTabOpen ? ["Comparação Detalhada"] : [])];
+  const tabs = ["TOTVS News", "Meu TOTVS", "Home", ...(detailTabOpen ? ["Comparação Detalhada"] : [])];
   const toggleContext = () => {
     setCompanyDraft(company);
     setContextExpanded((value) => !value);
@@ -99,7 +99,7 @@ function AppShell({ children, currentNav, onNavigate, detailTabOpen }) {
       <div className="header-actions"><IconButton label="Aplicativos" onClick={() => navigate("Home")}><DotsNine size={22} /></IconButton><div className="header-menu-anchor"><IconButton label="Notificações" aria-haspopup="dialog" aria-expanded={headerMenu === "notifications"} onClick={() => setHeaderMenu(headerMenu === "notifications" ? null : "notifications")}><Bell size={22} /></IconButton>{headerMenu === "notifications" && <div className="header-popover notification-popover" role="dialog" aria-label="Notificações"><strong>Notificações</strong><p><span className="notification-dot" />A análise inteligente encontrou 5 sugestões.</p><button type="button" onClick={() => { setHeaderMenu(null); navigate("Comparação Detalhada", { workspace: "suggestions", account: DEFAULT_ACCOUNT }); }}>Ver sugestões</button></div>}</div><div className="header-menu-anchor"><button type="button" className="avatar" aria-label="Perfil: Rafael R. Oliveira" aria-haspopup="menu" aria-expanded={headerMenu === "profile"} onClick={() => setHeaderMenu(headerMenu === "profile" ? null : "profile")}>RO</button>{headerMenu === "profile" && <div className="header-popover profile-popover" role="menu"><strong>Rafael R. Oliveira</strong><span>Administrador</span><button type="button" role="menuitem" onClick={() => { setHeaderMenu(null); window.dispatchEvent(new CustomEvent("smartx-toast", { detail: "Preferências do perfil abertas." })); }}>Preferências</button></div>}</div></div>
     </header>
     <nav className="product-tabs" aria-label="Abas abertas">{tabs.map((tab) => {
-      const destination = tab === "Conciliações" ? "Home" : tab;
+      const destination = tab;
       const active = currentNav === destination;
       if (tab === "Comparação Detalhada") return <span className={`product-tab-with-close ${active ? "active" : ""}`} key={tab}><button type="button" aria-current={active ? "page" : undefined} onClick={() => navigate(destination)}>{tab}</button><button type="button" className="product-tab-close" aria-label="Fechar Comparação Detalhada" onClick={() => onNavigate("close-detail")}><X size={16} /></button></span>;
       return <button type="button" key={tab} className={active ? "active" : ""} aria-current={active ? "page" : undefined} onClick={() => tab === "TOTVS News" || tab === "Meu TOTVS" ? window.dispatchEvent(new CustomEvent("smartx-toast", { detail: `${tab} selecionada.` })) : navigate(destination)}>{tab}</button>;

@@ -432,12 +432,12 @@ td code { color: var(--ani-color-text); font-family: ui-monospace, SFMono-Regula
 .workspace-metrics dd { margin: 0; overflow: hidden; text-overflow: ellipsis; font-size: 18px; font-weight: 720; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .workspace-metrics span { height: 5px; border-radius: 3px; background: var(--ani-color-border-soft); overflow: hidden; }
 .workspace-metrics i { display: block; height: 100%; border-radius: inherit; background: var(--ani-color-positive); }
-.workspace-tabs { display: flex; gap: 4px; padding: 5px; border: 1px solid var(--ani-color-border); border-radius: 8px; background: var(--ani-color-surface); box-shadow: var(--ani-shadow-sm); }
-.workspace-tabs button { min-height: 42px; display: inline-flex; align-items: center; gap: 8px; padding: 0 14px; border: 0; border-radius: 5px; background: transparent; color: var(--ani-color-text-secondary); cursor: pointer; font-weight: 650; }
-.workspace-tabs button:hover { background: var(--ani-color-surface-subtle); color: var(--ani-color-brand); }
-.workspace-tabs button.active { background: var(--ani-color-brand); color: #fff; }
-.workspace-tabs button span { min-width: 22px; padding: 2px 6px; border-radius: var(--ani-radius-pill); background: var(--ani-color-surface-subtle); color: var(--ani-color-brand); font-size: 10px; text-align: center; }
-.workspace-tabs button.active span { background: rgba(255,255,255,.18); color: #fff; }
+.workspace-tabs { height: 46px; display: flex; align-items: stretch; gap: 8px; border-bottom: 1px solid var(--ani-color-border); overflow-x: auto; }
+.workspace-tabs button { position: relative; flex: 0 0 auto; min-width: max-content; min-height: 46px; display: inline-flex; align-items: center; gap: 6px; padding: 0 16px; border: 0; background: transparent; color: var(--ani-color-text-secondary); cursor: pointer; font-weight: 650; white-space: nowrap; }
+.workspace-tabs button:hover { color: var(--ani-color-brand); }
+.workspace-tabs button.active { color: var(--ani-color-brand); }
+.workspace-tabs button.active::after { content: ""; position: absolute; right: 8px; bottom: -1px; left: 8px; height: 2px; background: var(--ani-color-brand); }
+.workspace-tabs button span { min-width: 0; padding: 0; border-radius: 0; background: transparent; color: var(--ani-color-text-muted); font-size: 12px; font-weight: 600; text-align: left; font-variant-numeric: tabular-nums; }
 .workspace-comparison, .workspace-panel { min-width: 0; display: grid; gap: 14px; }
 .review-priority { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 16px 18px; border: 1px solid color-mix(in srgb, var(--ani-color-warning) 24%, var(--ani-color-border)); border-radius: 8px; background: var(--ani-color-warning-bg); }
 .review-priority > span { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; background: var(--ani-color-surface); color: var(--ani-color-warning); font-size: 22px; }
@@ -575,7 +575,6 @@ td code { color: var(--ani-color-text); font-family: ui-monospace, SFMono-Regula
   .workspace-metrics { grid-template-columns: 1fr; }
   .workspace-metrics > div { min-height: 68px; padding: 11px 4px; }
   .workspace-metrics > div + div { border-left: 0; border-top: 1px solid var(--ani-color-border-soft); }
-  .workspace-tabs { overflow-x: auto; }
   .workspace-tabs button { flex: 0 0 auto; }
   .review-priority { grid-template-columns: auto 1fr; align-items: start; }
   .review-priority .button { grid-column: 1 / -1; width: 100%; }

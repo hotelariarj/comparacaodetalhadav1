@@ -5,6 +5,8 @@ Réplica web responsiva do protótipo `Comparação Detalhada v3`, ajustada apó
 ## O que está incluído
 
 - Shell Smart X validado no Figma: header TOTVS, abas, barra de contexto e navegação da jornada.
+- Home de conciliação com indicadores, grupos expansíveis e cards de contas.
+- Menu de três pontos que abre a comparação detalhada em uma nova aba interna.
 - Resumo da conciliação e filtros rápidos.
 - Busca, filtros, visão, paginação e seleção de registros.
 - Tabela desktop e cartões responsivos no mobile.

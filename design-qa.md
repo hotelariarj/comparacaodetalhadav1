@@ -1,46 +1,32 @@
-# Design QA — V1 com detalhamento de conta
+# Design QA — Home e Comparação Detalhada V1
 
-- Source visual truth path: https://conciliador-contabil.lovable.app/account-drilldown/1110001
-- Implementation screenshot path: browser capture of http://localhost:4173/ in the current task
-- Viewport: 1280 × 720 CSS px
-- Source pixels: 1280 × 720; implementation pixels: 1280 × 720
-- Density normalization: devicePixelRatio 1 for both captures
-- State: initial account drilldown plus document-analysis result state
-- Full-view comparison evidence: source and implementation were emitted together from the in-app browser at the same viewport.
-- Focused region evidence: account summary, document analysis, AI suggestions and both ledgers were inspected from current browser captures and DOM snapshots.
+- Source visual truth: Smart X/Animalia shell from the deployed V1 at https://hotelariarj.github.io/comparacaodetalhadav1/
+- Rendered implementation: local V1 Home at http://127.0.0.1:4174/
+- Viewport comparison: 1280 × 720 CSS px, same browser surface and density
+- Responsive verification: shared responsive rules validated at 390 × 844 CSS px in the V2 twin implementation
+- State: Home with Ativo Circulante expanded; account action menu; detailed-comparison tab open
+- Full-view evidence: the existing Smart X visual language and the new Home were compared at matching desktop dimensions.
+- Focused-region evidence: product tabs, account-group accordion, account cards, overflow menu and canonical drilldown were inspected through screenshots and accessibility snapshots.
 
 ## Findings
 
 No actionable P0, P1 or P2 findings remain.
 
-- Typography: intentionally translated from the Lovable font treatment to TOTVS Pro/Animalia hierarchy; weights and wrapping remain readable.
-- Spacing and layout: canonical section order is preserved; the Smart X header, tabs and context bar intentionally consume additional vertical space.
-- Colors and tokens: source statuses were mapped to Animalia semantic positive, warning and negative tokens.
-- Image quality and assets: correct TOTVS logo asset and Phosphor icon library are used; no placeholder imagery is required by this screen.
-- Copy and content: account values, document results, suggestion content and ledger records match the canonical source.
+- Typography: hierarchy and optical weights stay aligned with the existing Smart X/Animalia shell.
+- Spacing and layout: KPI rhythm, accordion headers and account-card grid are consistent with the existing card system.
+- Colors and tokens: all surfaces and status states use the existing Animalia semantic tokens.
+- Image quality and assets: the correct TOTVS logo remains in use and interface icons come from the existing Phosphor set.
+- Copy and content: group, account, balance, difference and status labels are realistic and internally consistent.
+- Interaction: expanding groups, opening the three-dot menu, choosing Comparação detalhada and creating the tab all work.
 
 ## Comparison history
 
-1. Initial audit found missing document validation and missing dual-ledger comparison in V1.
-2. Added account drilldown, document states, suggestions and both ledgers.
-3. First visual comparison found the Razão Analítico last column labelled as Status instead of Ações.
-4. Fixed the column label and added per-row action controls; post-fix DOM and build verification passed.
-
-## Primary interactions tested
-
-- Open account drilldown.
-- Run document analysis through loading and completed states.
-- Generate reconciliation suggestions.
-- Accept a suggestion and update accepted/pending counts.
-- Open row action and external-system affordances.
-
-## Console
-
-No browser console errors or warnings were observed in the final V2-equivalent implementation path.
+1. Added the Home and dynamic detail tab using the existing V1 shell.
+2. Desktop and accessibility review found no actionable visual or interaction mismatch.
+3. Production build, interaction audit and packaging tests passed.
 
 ## Follow-up polish
 
-- P3: a future pass can add animated progressive disclosure for long document-result lists.
+- P3: production data may later benefit from search and status filters when the number of account groups grows.
 
 final result: passed
-

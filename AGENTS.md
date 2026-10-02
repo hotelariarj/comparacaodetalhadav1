@@ -12,6 +12,8 @@ Before making substantial visual changes, use the Product Design plugin's `get-c
 - V2 represents the current production flow restyled with the Animália/Smart X design system. Do not copy V2's detailed-comparison structure into this repository.
 - Preserve the selected account end to end. Every entry from Home must open the detail with that account's code, name, balances, status, and attachments, and returning must restore the Home flow.
 - Visual similarity in the global shell and Home is expected. Similarity between the V1 and V2 detailed-comparison experiences is a regression.
+- Controle de Acesso is an independent V1 module at `#/controle-de-acesso`. Changes to this module must stay isolated from `AccountDrilldown.jsx` and must not alter the detailed-comparison flow, layout, data or interactions.
+- Cadastros de Conciliação is an independent V1 module at `#/cadastros`; keep its account-linking data and workflows isolated from `AccountDrilldown.jsx` and the detailed-comparison flow.
 
 When implementing from a selected generated mock, treat that image as the source of truth for layout, component anatomy, density, spacing, color, typography, visible content, and hierarchy.
 

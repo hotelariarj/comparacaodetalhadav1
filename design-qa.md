@@ -1,32 +1,60 @@
-# Design QA — Home e Comparação Detalhada V1
+# Design QA — Módulos adicionais na V1
 
-- Source visual truth: Smart X/Animalia shell from the deployed V1 at https://hotelariarj.github.io/comparacaodetalhadav1/
-- Rendered implementation: local V1 Home at http://127.0.0.1:4174/
-- Viewport comparison: 1280 × 720 CSS px, same browser surface and density
-- Responsive verification: shared responsive rules validated at 390 × 844 CSS px in the V2 twin implementation
-- State: Home with Ativo Circulante expanded; account action menu; detailed-comparison tab open
-- Full-view evidence: the existing Smart X visual language and the new Home were compared at matching desktop dimensions.
-- Focused-region evidence: product tabs, account-group accordion, account cards, overflow menu and canonical drilldown were inspected through screenshots and accessibility snapshots.
+## Cadastros de Conciliação
+
+- Fonte: tela `Cadastros de Conciliação - Natalia` e `Documentacao - Cadastros e Controle de Acesso` do projeto Claude Design compartilhado.
+- Rota: `#/cadastros`, independente da comparação detalhada.
+- Implementação própria em `src/ReconciliationRegistries.jsx` e `src/reconciliation-registries.css`; as abas Não Vinculadas, Vinculadas e Todas, filtros por sistema, seleção de contas, modal de vínculo, seleção de relatórios, edição, desvinculação com confirmação e desfazer são locais ao módulo.
+- A seleção de contas em lote respeita a mesma Conta Gov (ECD); o CTA de vínculo exige ao menos uma conta e um relatório.
+- Estilo reaproveita os tokens Smart X/Animália e o shell global existente da V1.
+- Build de produção concluído após a inclusão.
+- A comparação detalhada (`src/AccountDrilldown.jsx`) permaneceu sem diff.
+
+## Controle de Acesso
+
+- Source visual truth: `https://claude.ai/design/p/0413b3de-a625-4b20-831a-88e631bf8629?file=Controle+de+Acesso+-+Natalia.dc.html&via=share` (Codex Browser tab 45, embedded prototype at 953 × 658 CSS px).
+- Implementation screenshot: `http://127.0.0.1:4175/?qa=access#/controle-de-acesso` (Codex Browser tab 47, captures at 953 × 658 and 390 × 844 CSS px).
+- Pixel dimensions: desktop source capture 1280 × 720 containing the 953 × 658 prototype canvas; desktop implementation capture 953 × 658; mobile implementation capture 390 × 844.
+- Density normalization: browser CSS pixels at device scale 1; the source comparison used the visible 953 × 658 embedded canvas and the implementation used the same CSS viewport.
+- State: initial list, all accounts, comfortable density, no filter or overlay open.
+
+## Full-view comparison evidence
+
+The source and implementation were emitted in the same browser comparison pass. The content hierarchy matches: page title and update action, inactive-account warning, Todos/Membros/Grupos tabs, search/filter/view toolbar, record count, blue-gray list header, account rows, access-role pills and floating IA action. The global shell intentionally remains the existing V1 shell, per the requirement not to alter the V1 product context.
+
+## Focused region comparison evidence
+
+Focused DOM and interaction checks covered the toolbar, table rows and overlays because these are the fidelity-critical dense regions. Search reduced the list to one Luiz Fernandes record; tabs showed three members and three groups; the AUDITORIA drawer displayed its members; the role menu exposed the three roles; compact density updated the row treatment; the inactive review applied its filter and opened the revoke confirmation.
 
 ## Findings
 
-No actionable P0, P1 or P2 findings remain.
+- No actionable P0/P1/P2 visual mismatch remains.
+- Accepted constraint: at 390 px the dense three-column list scrolls horizontally, matching the reference's table-first behavior rather than collapsing role data into a different mobile card pattern.
+- Accepted intentional difference: environment, company and global navigation retain the existing V1 values and styling instead of copying the source prototype's separate shell.
 
-- Typography: hierarchy and optical weights stay aligned with the existing Smart X/Animalia shell.
-- Spacing and layout: KPI rhythm, accordion headers and account-card grid are consistent with the existing card system.
-- Colors and tokens: all surfaces and status states use the existing Animalia semantic tokens.
-- Image quality and assets: the correct TOTVS logo remains in use and interface icons come from the existing Phosphor set.
-- Copy and content: group, account, balance, difference and status labels are realistic and internally consistent.
-- Interaction: expanding groups, opening the three-dot menu, choosing Comparação detalhada and creating the tab all work.
+## Required fidelity surfaces
+
+- Fonts and typography: existing TOTVS Pro stack, weights and hierarchy preserved; app-specific labels and role text match the reference.
+- Spacing and layout rhythm: 8 px card radii, 44 px controls, 48/64 px rows, warning spacing and toolbar rhythm match the source closely.
+- Colors and visual tokens: reused V1 Animália/Smart X semantic tokens for brand, warning, surfaces, borders and focus states.
+- Image quality and assets: no missing raster artwork; real Phosphor icons and the existing TOTVS logo asset are used.
+- Copy and content: six source records, account labels, groups, roles, warning and review copy are represented.
+
+## Interaction and regression checks
+
+- Menu item opens `#/controle-de-acesso`.
+- Search, tabs, sorting, filters, density, group drawer, role selection, inactive review and revoke confirmation work.
+- Returning through the Comparison menu opens `#/comparacao/1.1.2.001/comparison` with Banco Conta Movimento and “Começar revisão”.
+- Browser console: 0 warnings and 0 errors.
+- `AccountDrilldown.jsx`: no diff.
+- Automated interaction audit, Sites tests and production build: passed.
 
 ## Comparison history
 
-1. Added the Home and dynamic detail tab using the existing V1 shell.
-2. Desktop and accessibility review found no actionable visual or interaction mismatch.
-3. Production build, interaction audit and packaging tests passed.
+- Pass 1: no P0/P1/P2 findings. No visual fix loop was required.
 
 ## Follow-up polish
 
-- P3: production data may later benefit from search and status filters when the number of account groups grows.
+- P3: a future dedicated mobile design could replace horizontal table scrolling with account cards, but that would intentionally diverge from the supplied reference.
 
 final result: passed

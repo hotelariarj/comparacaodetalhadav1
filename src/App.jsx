@@ -6,12 +6,15 @@ import {
   WarningCircle, X,
 } from "@phosphor-icons/react";
 import AccountDrilldown from "./AccountDrilldown";
+import AccessControl from "./AccessControl";
+import ReconciliationRegistries from "./ReconciliationRegistries";
 
 const navItems = [
   { label: "Home", icon: House },
   { label: "Comparação Detalhada", icon: ChartBar, active: true },
   { label: "Logs de Auditoria", icon: ClockCounterClockwise },
   { label: "Cadastros", icon: List },
+  { label: "Controle de Acesso", icon: CheckCircle },
   { label: "Mapa do Projeto", icon: MapTrifold },
 ];
 
@@ -20,6 +23,7 @@ const routeByNav = {
   "Comparação Detalhada": "comparacao",
   "Logs de Auditoria": "logs",
   Cadastros: "cadastros",
+  "Controle de Acesso": "controle-de-acesso",
   "Mapa do Projeto": "mapa",
 };
 
@@ -190,7 +194,7 @@ export function App() {
   };
 
   return <AppShell currentNav={currentNav} onNavigate={navigateTo} detailTabOpen={detailTabOpen}>
-    {currentNav === "Home" ? <HomeDashboard view={homeView} onViewChange={setHomeView} expandedGroups={homeExpandedGroups} onExpandedGroupsChange={setHomeExpandedGroups} approvedAccounts={homeApprovedAccounts} onApprovedAccountsChange={setHomeApprovedAccounts} sessionAttachments={homeSessionAttachments} onSessionAttachmentsChange={setHomeSessionAttachments} dailySystem={homeDailySystem} onDailySystemChange={setHomeDailySystem} dailyStatus={homeDailyStatus} onDailyStatusChange={setHomeDailyStatus} onOpenComparison={openAccountComparison} onToast={setToast} /> : currentNav !== "Comparação Detalhada" ? <ModulePage name={currentNav} onBack={() => navigateTo("Home")} /> : <AccountDrilldown key={selectedAccount.code} account={selectedAccount} initialWorkspace={detailWorkspace} onBack={() => navigateTo("Home")} onToast={setToast} />}
+    {currentNav === "Home" ? <HomeDashboard view={homeView} onViewChange={setHomeView} expandedGroups={homeExpandedGroups} onExpandedGroupsChange={setHomeExpandedGroups} approvedAccounts={homeApprovedAccounts} onApprovedAccountsChange={setHomeApprovedAccounts} sessionAttachments={homeSessionAttachments} onSessionAttachmentsChange={setHomeSessionAttachments} dailySystem={homeDailySystem} onDailySystemChange={setHomeDailySystem} dailyStatus={homeDailyStatus} onDailyStatusChange={setHomeDailyStatus} onOpenComparison={openAccountComparison} onToast={setToast} /> : currentNav === "Cadastros" ? <ReconciliationRegistries onToast={setToast} /> : currentNav !== "Comparação Detalhada" ? (currentNav === "Controle de Acesso" ? <AccessControl onToast={setToast} /> : <ModulePage name={currentNav} onBack={() => navigateTo("Home")} />) : <AccountDrilldown key={selectedAccount.code} account={selectedAccount} initialWorkspace={detailWorkspace} onBack={() => navigateTo("Home")} onToast={setToast} />}
     {toast && <div className="toast" role="status"><CheckCircle weight="fill" /><span>{toast}</span><IconButton label="Fechar notificação" onClick={() => setToast("")}><X /></IconButton></div>}
   </AppShell>;
 }

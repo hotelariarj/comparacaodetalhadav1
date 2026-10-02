@@ -51,7 +51,7 @@
           "totalAmount": 6000.0
         }
       },
-      "reasoning": "A soma de 3 movimentos no Sistema Origem totaliza R$ 6.000,00 e corresponde exatamente ao lancamento unico na Contabilidade. As datas coincidem, indicando pagamento consolidado em lote bancario."
+      "reasoning": "A soma de 3 movimentos no Sistema Origem totaliza R$ 6.000,00 e corresponde exatamente ao lançamento único na Contabilidade. As datas coincidem, indicando pagamento consolidado em lote bancário."
     },
     {
       "id": "match_002",
@@ -77,7 +77,7 @@
           "totalAmount": 15000.0
         }
       },
-      "reasoning": "Valores identicos e descricoes compativeis. A data do sistema e um dia apos a contabilidade, compativel com compensacao bancaria apos o fim de semana."
+      "reasoning": "Valores idênticos e descrições compatíveis. A data do sistema é um dia após a contabilidade, compatível com compensação bancária após o fim de semana."
     },
     {
       "id": "match_003",
@@ -103,7 +103,7 @@
           "totalAmount": 89.8
         }
       },
-      "reasoning": "Mesma data e descricoes relacionadas a tarifa bancaria. Ha pequena diferenca de valor (R$ 0,10) que pode refletir arredondamento ou taxa adicional."
+      "reasoning": "Mesma data e descrições relacionadas à tarifa bancária. Há pequena diferença de valor (R$ 0,10) que pode refletir arredondamento ou taxa adicional."
     },
     {
       "id": "match_004",

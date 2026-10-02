@@ -4,7 +4,7 @@ Réplica web responsiva do protótipo `Comparação Detalhada v3`, ajustada apó
 
 ## O que está incluído
 
-- Shell Smart X com header TOTVS e navegação da jornada.
+- Shell Smart X validado no Figma: header TOTVS, abas, barra de contexto e navegação da jornada.
 - Resumo da conciliação e filtros rápidos.
 - Busca, filtros, visão, paginação e seleção de registros.
 - Tabela desktop e cartões responsivos no mobile.
@@ -26,6 +26,7 @@ npm run dev
 
 ```bash
 npm run build
+npm run test:interactions
 npm run test:sites
 ```
 

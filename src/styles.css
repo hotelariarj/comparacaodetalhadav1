@@ -119,6 +119,7 @@ h1 { margin: 0; color: var(--ani-color-text); font-size: clamp(23px, 2.1vw, 30px
 .ai-callout > svg { flex: 0 0 auto; color: var(--ani-color-brand); font-size: 24px; }
 .ai-callout > span { flex: 1; }
 .workspace { display: grid; min-width: 0; }
+.summary-card + .workspace { margin-top: var(--ani-space-4); }
 .workspace.with-ai { grid-template-columns: minmax(0, 1fr) minmax(300px, 350px); gap: 12px; align-items: start; }
 .table-card { min-width: 0; border: 1px solid var(--ani-color-border-soft); border-radius: var(--ani-radius-control); background: var(--ani-color-surface); box-shadow: var(--ani-shadow-sm); overflow: visible; }
 .toolbar { position: relative; display: flex; align-items: center; gap: 8px; min-height: 68px; padding: 12px 14px; border-bottom: 1px solid var(--ani-color-border-soft); }
